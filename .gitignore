@@ -1,0 +1,45 @@
+# Environment variables and secrets
+.env
+.env.local
+.env.production
+.env.development
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+.Python
+*.so
+.pytest_cache/
+
+# Database
+*.db
+*.sqlite3
+mentors.db
+
+# Virtual Environment
+venv/
+.venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Build and dist
+dist/
+build/
+*.egg-info/
