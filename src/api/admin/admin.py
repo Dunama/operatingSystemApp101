@@ -122,7 +122,7 @@ def view_all_users():
         <div class="container">
             <div class="header">
                 <h1>CSC 101 ADMIN MANAGEMENT BOARD</h1>
-            </div>  
+            </div>
             <!-- Display summary statistics -->
             <div class="stats">
                 <h3>📊 User Statistics</h3>
@@ -149,6 +149,9 @@ def view_all_users():
             <!-- Control buttons -->
             <div class="controls">
                 <button class="refresh-btn" onclick="refreshData()">🔄 Refresh Now</button>
+                <button class="auto-refresh-btn" onclick="toggleAutoRefresh()">⏰ Auto Refresh</button>
+                <button class="test-btn" onclick="testSignup()">🧪 Test Signup Process</button>
+                <span id="autoRefreshStatus" class="auto-refresh-status auto-refresh-off">OFF</span>
             </div>
             
             <!-- Display user table -->
@@ -334,3 +337,4 @@ def search_users_by_email(email_pattern):
     except Exception as e:
         print(f"Error searching users: {e}")
         return []
+

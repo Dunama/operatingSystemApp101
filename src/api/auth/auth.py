@@ -55,8 +55,22 @@ def googleLogin():
 def googleCallback():
     '''redirect after pro'''
     token = oauth.myApp.authorize_access_token()
-    session["user"] = token
-    return redirect(url_for("auth.login"))
+    userinfo = token.get("userinfo") or token
+    email = userinfo.get("email")
+    from src.db.models.users import User
+    from src.db.core import db
+
+    # Check if user exists, else create
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        user = User(email=email, is_pro=False)
+        db.session.add(user)
+        db.session.commit()
+
+    # Save user info in session
+    session["user"] = {"email": email}
+    session["user_pro_status"] = user.is_pro
+
 
 @auth_bp.route('/login')
 def login():
