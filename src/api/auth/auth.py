@@ -40,7 +40,7 @@ def pro_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-@auth_bp.route("/signup")
+@auth_bp.route("/")
 def signup():
     '''signup page'''
     return render_template("signup.html")
@@ -56,7 +56,7 @@ def googleCallback():
     '''redirect after pro'''
     token = oauth.myApp.authorize_access_token()
     session["user"] = token
-    return redirect(url_for("auth.home"))
+    return redirect(url_for("auth.login"))
 
 @auth_bp.route('/login')
 def login():

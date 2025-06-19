@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Test</title>
+    <title>Quiz Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -20,8 +20,11 @@
     <div class="container mx-auto px-4 py-12 max-w-3xl">  <!-- Updated max-width and padding -->
         <!-- Header -->
         <div class="text-center mb-6"> <!-- Reduced from mb-8 -->
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800">Practice Quiz</h1>
-            <p class="text-base sm:text-lg text-gray-600 mt-2">Test your knowledge with full-length practice questions</p>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800">Demo Quiz</h1>
+            <p class="text-base sm:text-lg text-gray-600 mt-2">Try our quick 5-question demo to get familiar with the format</p>
+            <div class="mt-4 bg-blue-50 rounded-lg p-4 inline-block">
+                <p class="text-sm sm:text-base text-blue-700"><span class="font-semibold">Time Limit:</span> 6 minutes for 5 questions</p>
+            </div>
         </div>
         
         <div id="loading" class="text-center py-8 sm:py-10">
@@ -31,8 +34,8 @@
         
         <div id="quiz-container" class="bg-white rounded-lg shadow-md p-3 sm:p-6 mb-4 sm:mb-6 hidden">
             <div class="flex flex-col sm:flex-row justify-between items-center mb-2 sm:mb-4 gap-2">
-                <span id="question-counter" class="text-gray-600 font-medium text-xs sm:text-base">Question 1 of 70</span>
-                <span id="timer" class="text-gray-600 font-medium text-xs sm:text-base">Time: 00:00 | Left: 06:00</span>
+                <span id="question-counter" class="text-gray-600 font-medium text-xs sm:text-base">Question 1 of 5</span>
+                <span id="timer" class="text-gray-600 font-medium text-xs sm:text-base">Time: 00:00</span>
             </div>
             
             <div id="question-container" class="mb-6 sm:mb-8">
@@ -48,9 +51,9 @@
                 </button>
                 
                 <div class="flex flex-col sm:flex-row items-center gap-2">
-                    <span id="progress-text" class="mr-0 sm:mr-4 font-medium text-xs sm:text-base">1/70</span>
+                    <span id="progress-text" class="mr-0 sm:mr-4 font-medium text-xs sm:text-base">1/5</span>
                     <div class="w-full sm:w-40 h-2 bg-gray-200 rounded-full inline-block align-middle">
-                        <div id="progress-bar" class="h-2 bg-blue-600 rounded-full" style="width: 1.4%"></div>
+                        <div id="progress-bar" class="h-2 bg-blue-600 rounded-full" style="width: 20%"></div>
                     </div>
                 </div>
                 
@@ -65,16 +68,15 @@
         </div>
         
         <div id="results-container" class="bg-white rounded-lg shadow-md p-3 sm:p-6 hidden">
-            <h2 class="text-xl sm:text-2xl font-bold text-center mb-2 sm:mb-4">Test Results</h2>
+            <h2 class="text-xl sm:text-2xl font-bold text-center mb-2 sm:mb-4">Quiz Results</h2>
             <div class="text-center mb-6 sm:mb-8">
                 <div class="inline-block w-32 h-32 sm:w-48 sm:h-48 rounded-full border-8 border-green-500 flex items-center justify-center">
-                    <span id="score-display" class="text-3xl sm:text-5xl font-bold">0/70</span>
+                    <span id="score-display" class="text-3xl sm:text-5xl font-bold">0/5</span>
                 </div>
                 <p class="mt-2 sm:mt-4 text-2xl sm:text-3xl font-medium" id="percentage-display">0%</p>
-                <p id="time-used" class="mt-1 sm:mt-2 text-base sm:text-lg text-gray-700">Time used: 0min 0sec</p>
             </div>
             
-            <div id="detailed-results" class="space-y-2 sm:space-y-4 max-h-60 sm:max-h-96 overflow-y-auto">
+            <div id="detailed-results" class="space-y-2 sm:space-y-4">
                 <!-- Detailed results will be inserted here -->
             </div>
             
@@ -93,10 +95,10 @@
         let userAnswers = {};
         let startTime = null;
         let timerInterval = null;
-        let totalQuizTime = 0;
+        let totalQuizTime = 0; // Track total time spent
         
-        // Timer duration in seconds (1 hr)
-        const TIMER_DURATION = 3600;
+        // Timer duration in seconds (6 minutes)
+        const TIMER_DURATION = 360;
         let timeLeft = TIMER_DURATION;
         
         // DOM elements
@@ -117,7 +119,7 @@
         // Fetch questions from API
         async function fetchQuestions() {
             try {
-                const response = await fetch('/api/practice/questions/submit');
+                const response = await fetch('/api/demo/questions/submit');
                 if (!response.ok) {
                     throw new Error('Failed to fetch questions');
                 }
@@ -143,11 +145,7 @@
         function displayQuestion(index) {
             const question = questions[index];
             questionTextEl.textContent = question.question;
-            
-            // Clear options container
             optionsContainerEl.innerHTML = '';
-            
-            // Add options
             question.options.forEach(option => {
                 const optionEl = document.createElement('div');
                 optionEl.className = 'flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 border rounded-lg transition-colors hover:bg-gray-50 w-full';
@@ -208,10 +206,13 @@
                 nextBtnEl.classList.add('hidden');
                 submitBtnEl.classList.remove('hidden');
                 
-                // Always enable submit button on last question
-                submitBtnEl.disabled = false;
-                submitBtnEl.classList.remove('opacity-50', 'cursor-not-allowed');
-                console.log('Submit button should be visible and enabled');
+                // Enable/disable submit button based on whether all questions are answered
+                submitBtnEl.disabled = !areAllQuestionsAnswered();
+                if (areAllQuestionsAnswered()) {
+                    submitBtnEl.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    submitBtnEl.classList.add('opacity-50', 'cursor-not-allowed');
+                }
             } else {
                 nextBtnEl.classList.remove('hidden');
                 submitBtnEl.classList.add('hidden');
@@ -270,25 +271,19 @@
             // Auto-submit when time runs out
             if (timeLeft === 0) {
                 clearInterval(timerInterval);
-                alert('Time is up! Submitting your test.');
+                alert('Time is up! Submitting your quiz.');
                 submitQuiz();
             }
         }
         
         // Submit the quiz
         async function submitQuiz() {
-            // Stop the timer
             clearInterval(timerInterval);
             
-            // Log to debug
-            console.log('Submit button clicked');
-            console.log('User answers:', userAnswers);
-            console.log('Questions length:', questions.length);
-            console.log('Questions answered:', Object.keys(userAnswers).length);
-            console.log('Total time used:', totalQuizTime);
+            // Calculate total time spent (already tracked in updateTimer)
             
             try {
-                const response = await fetch('/api/practice/questions/submit', {
+                const response = await fetch('/api/demo/questions/submit', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -297,19 +292,14 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Failed to submit test');
+                    throw new Error('Failed to submit quiz');
                 }
                 
                 const results = await response.json();
                 displayResults(results);
             } catch (error) {
                 console.error('Error:', error);
-                alert('Failed to submit test: ' + error.message);
-                
-                // Re-enable the submit button in case of error
-                submitBtnEl.disabled = false;
-                submitBtnEl.classList.remove('opacity-50', 'cursor-not-allowed');
-                submitBtnEl.textContent = 'Submit Answers';
+                alert('Failed to submit quiz: ' + error.message);
             }
         }
         
@@ -323,7 +313,7 @@
             document.getElementById('score-display').textContent = `${results.score}/${results.total}`;
             document.getElementById('percentage-display').textContent = `${results.percentage.toFixed(0)}%`;
             
-            // Display time spent in a more readable format
+            // Display time spent with proper formatting
             const hours = Math.floor(totalQuizTime / 3600);
             const minutes = Math.floor((totalQuizTime % 3600) / 60);
             const seconds = totalQuizTime % 60;
@@ -335,18 +325,29 @@
                 timeUsedText = `Time used: ${minutes}min ${seconds}sec`;
             }
             
-            document.getElementById('time-used').textContent = timeUsedText;
+            // Add time spent information below percentage
+            const percentageDisplay = document.getElementById('percentage-display');
+            let timeUsedEl = document.getElementById('time-used');
+            
+            if (!timeUsedEl) {
+                timeUsedEl = document.createElement('p');
+                timeUsedEl.id = 'time-used';
+                timeUsedEl.className = 'mt-2 text-lg text-gray-700';
+                percentageDisplay.parentNode.insertBefore(timeUsedEl, percentageDisplay.nextSibling);
+            }
+            
+            timeUsedEl.textContent = timeUsedText;
             
             // Set score circle color based on percentage
             const scoreCircle = document.querySelector('#score-display').parentElement;
             if (results.percentage >= 80) {
-                scoreCircle.classList.remove('border-green-500', 'border-yellow-500', 'border-red-500');
+                scoreCircle.classList.remove('border-green-500');
                 scoreCircle.classList.add('border-green-500');
             } else if (results.percentage >= 60) {
-                scoreCircle.classList.remove('border-green-500', 'border-yellow-500', 'border-red-500');
+                scoreCircle.classList.remove('border-green-500');
                 scoreCircle.classList.add('border-yellow-500');
             } else {
-                scoreCircle.classList.remove('border-green-500', 'border-yellow-500', 'border-red-500');
+                scoreCircle.classList.remove('border-green-500');
                 scoreCircle.classList.add('border-red-500');
             }
             
@@ -356,7 +357,7 @@
             
             results.results.forEach(result => {
                 const resultEl = document.createElement('div');
-                resultEl.className = 'p-4 border rounded-lg mb-2';
+                resultEl.className = 'p-4 border rounded-lg';
                 
                 // Add appropriate background color based on correctness
                 if (result.is_correct) {
@@ -380,19 +381,14 @@
                 
                 detailedResultsEl.appendChild(resultEl);
             });
+            
+            // Remove the duplicate time spent element that was being added at the end
+            const existingTimeSpentElements = resultsContainerEl.querySelectorAll('.mt-4.text-center.text-gray-600.font-medium');
+            existingTimeSpentElements.forEach(el => el.remove());
         }
         
         // Event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize quiz
-            fetchQuestions();
-            
-            // Make sure submit button has click listener
-            submitBtnEl.onclick = function() {
-                console.log('Submit button clicked via onclick');
-                submitQuiz();
-            };
-        });
+        document.addEventListener('DOMContentLoaded', fetchQuestions);
         
         prevBtnEl.addEventListener('click', () => {
             if (currentQuestionIndex > 0) {
@@ -408,11 +404,7 @@
             }
         });
         
-        // Replace existing submit button listener with a more direct approach
-        submitBtnEl.onclick = function() {
-            console.log('Submit button clicked via onclick');
-            submitQuiz();
-        };
+        submitBtnEl.addEventListener('click', submitQuiz);
         
         retryBtnEl.addEventListener('click', () => {
             // Reset variables
@@ -431,12 +423,14 @@
             updateButtonStates();
         });
         
-        // Listen for keyboard events for option selection (A-D)
+        // Enhanced keyboard navigation
         document.addEventListener('keydown', function(event) {
             // Only respond if quiz is visible and not in results
-            if (quizContainerEl.classList.contains('hidden') || resultsContainerEl.classList.contains('block')) return;
+            if (quizContainerEl.classList.contains('hidden') || 
+                resultsContainerEl.classList.contains('visible') || 
+                resultsContainerEl.classList.contains('block')) return;
 
-            // Map keys a-d/A-D to option labels
+            // Handle option selection with A-D keys
             const key = event.key.toLowerCase();
             if (key >= 'a' && key <= 'd') {
                 const question = questions[currentQuestionIndex];
@@ -464,9 +458,21 @@
             
             // Navigation with arrow keys
             if (event.key === 'ArrowLeft' && !prevBtnEl.disabled) {
+                // Go to previous question
                 prevBtnEl.click();
-            } else if (event.key === 'ArrowRight' && !nextBtnEl.classList.contains('hidden')) {
-                nextBtnEl.click();
+                event.preventDefault(); // Prevent scrolling
+            } 
+            else if (event.key === 'ArrowRight') {
+                if (!nextBtnEl.classList.contains('hidden')) {
+                    // Go to next question if next button is visible
+                    nextBtnEl.click();
+                    event.preventDefault(); // Prevent scrolling
+                } 
+                else if (currentQuestionIndex === questions.length - 1 && !submitBtnEl.disabled) {
+                    // Submit if on last question and submit button is enabled
+                    submitBtnEl.click();
+                    event.preventDefault(); // Prevent scrolling
+                }
             }
         });
     </script>

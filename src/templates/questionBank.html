@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Bank</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Back Button with Background -->
+    <div class="fixed top-0 left-0 right-0 h-12 bg-gradient-to-b from-white to-transparent z-40"></div>
+    <button onclick="window.history.back()" 
+            class="fixed top-2 left-2 z-50 flex items-center bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-3 rounded-lg text-sm shadow-lg transition-colors border border-gray-200">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back
+    </button>
+
+    <div class="container mx-auto px-4 py-12 max-w-4xl">  <!-- Updated max-width for question bank -->
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800">Question Bank</h1>
+            <p class="text-base sm:text-lg text-gray-600 mt-2">Browse and practice from our comprehensive collection</p>
+        </div>
+
+        <!-- Search and Filter Controls -->
+        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Search Questions</label>
+                    <input type="text" id="search-input" placeholder="Type to search questions..." 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Question Number</label>
+                    <input type="number" id="question-number-filter" placeholder="Filter by question number..." 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button id="clear-filters" class="flex-1 sm:flex-none bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md text-sm min-w-[120px]">
+                        Clear Filters
+                    </button>
+                    <button id="refresh-btn" class="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md text-sm min-w-[120px]">
+                        Refresh
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <span id="question-count" class="text-sm text-gray-600 flex-1 sm:flex-none text-center sm:text-right">Loading questions...</span>
+                    <button id="practice-quiz-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-sm min-w-[160px]">
+                        Start Practice Quiz
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="text-center py-8 sm:py-10">
+            <div class="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-700 mx-auto"></div>
+            <p class="mt-2 sm:mt-4 text-gray-700 text-xs sm:text-base">Loading questions...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-container" class="bg-red-50 border border-red-200 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+            <h3 class="text-base sm:text-lg font-semibold text-red-800 mb-1 sm:mb-2">Error Loading Questions</h3>
+            <p id="error-message" class="text-xs sm:text-base text-red-600"></p>
+            <button id="retry-btn" class="mt-3 sm:mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-2 sm:px-4 rounded-md text-xs sm:text-base">
+                Try Again
+            </button>
+        </div>
+
+        <!-- Questions Container -->
+        <div id="questions-container" class="space-y-3 sm:space-y-4 hidden">
+            <!-- Questions will be dynamically inserted here -->
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination-container" class="mt-6 sm:mt-8 flex justify-center items-center space-x-2 sm:space-x-4 hidden">
+            <button id="prev-page-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-2 sm:px-4 rounded-md text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed w-24 sm:w-auto">
+                Previous
+            </button>
+            <span id="page-info" class="text-gray-600 font-medium text-xs sm:text-base">Page 1 of 1</span>
+            <button id="next-page-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-2 sm:px-4 rounded-md text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed w-24 sm:w-auto">
+                Next
+            </button>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="text-center py-10 sm:py-16 hidden">
+            <div class="text-4xl sm:text-6xl text-gray-300 mb-2 sm:mb-4">📚</div>
+            <h3 class="text-base sm:text-xl font-semibold text-gray-600 mb-1 sm:mb-2">No Questions Found</h3>
+            <p class="text-xs sm:text-base text-gray-500">Try adjusting your search criteria or refresh the page.</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let allQuestions = [];
+        let filteredQuestions = [];
+        let currentPage = 1;
+        const questionsPerPage = 10;
+
+        // DOM elements
+        const loadingEl = document.getElementById('loading');
+        const errorContainerEl = document.getElementById('error-container');
+        const errorMessageEl = document.getElementById('error-message');
+        const questionsContainerEl = document.getElementById('questions-container');
+        const questionCountEl = document.getElementById('question-count');
+        const searchInputEl = document.getElementById('search-input');
+        const questionNumberFilterEl = document.getElementById('question-number-filter');
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const retryBtn = document.getElementById('retry-btn');
+        const practiceQuizBtn = document.getElementById('practice-quiz-btn');
+        const paginationContainerEl = document.getElementById('pagination-container');
+        const prevPageBtn = document.getElementById('prev-page-btn');
+        const nextPageBtn = document.getElementById('next-page-btn');
+        const pageInfoEl = document.getElementById('page-info');
+        const emptyStateEl = document.getElementById('empty-state');
+
+        // Fetch questions from API
+        async function fetchQuestions() {
+            try {
+                showLoading();
+                const response = await fetch('/api/comprehensive/all-questions/submit');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                allQuestions = await response.json();
+                filteredQuestions = [...allQuestions];
+                currentPage = 1;
+                
+                hideLoading();
+                updateDisplay();
+                
+            } catch (error) {
+                console.error('Error fetching questions:', error);
+                showError(error.message);
+            }
+        }
+
+        // Display functions
+        function showLoading() {
+            loadingEl.classList.remove('hidden');
+            errorContainerEl.classList.add('hidden');
+            questionsContainerEl.classList.add('hidden');
+            paginationContainerEl.classList.add('hidden');
+            emptyStateEl.classList.add('hidden');
+        }
+
+        function hideLoading() {
+            loadingEl.classList.add('hidden');
+        }
+
+        function showError(message) {
+            hideLoading();
+            errorMessageEl.textContent = message;
+            errorContainerEl.classList.remove('hidden');
+            questionsContainerEl.classList.add('hidden');
+            paginationContainerEl.classList.add('hidden');
+            emptyStateEl.classList.add('hidden');
+        }
+
+        // Update the main display
+        function updateDisplay() {
+            if (filteredQuestions.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            hideEmptyState();
+            updateQuestionCount();
+            displayQuestions();
+            updatePagination();
+        }
+
+        function showEmptyState() {
+            questionsContainerEl.classList.add('hidden');
+            paginationContainerEl.classList.add('hidden');
+            emptyStateEl.classList.remove('hidden');
+            questionCountEl.textContent = 'No questions found';
+        }
+
+        function hideEmptyState() {
+            emptyStateEl.classList.add('hidden');
+            questionsContainerEl.classList.remove('hidden');
+            if (filteredQuestions.length > questionsPerPage) {
+                paginationContainerEl.classList.remove('hidden');
+            }
+        }
+
+        // Update question count display
+        function updateQuestionCount() {
+            const totalQuestions = allQuestions.length;
+            const filteredCount = filteredQuestions.length;
+            
+            if (filteredCount === totalQuestions) {
+                questionCountEl.textContent = `Showing ${totalQuestions} questions`;
+            } else {
+                questionCountEl.textContent = `Showing ${filteredCount} of ${totalQuestions} questions`;
+            }
+        }
+
+        // Display questions for current page
+        function displayQuestions() {
+            const startIndex = (currentPage - 1) * questionsPerPage;
+            const endIndex = startIndex + questionsPerPage;
+            const questionsToShow = filteredQuestions.slice(startIndex, endIndex);
+
+            questionsContainerEl.innerHTML = '';
+
+            questionsToShow.forEach(question => {
+                const questionEl = createQuestionElement(question);
+                questionsContainerEl.appendChild(questionEl);
+            });
+        }
+
+        // Create a question element
+        function createQuestionElement(question) {
+            const questionEl = document.createElement('div');
+            questionEl.className = 'bg-white rounded-lg shadow-md p-3 sm:p-6 border border-gray-200 hover:shadow-lg transition-shadow';
+
+            // Create options HTML
+            const optionsHtml = question.options.map(option => 
+                `<div class="flex items-start space-x-2 p-1 sm:p-2 bg-gray-50 rounded">
+                    <span class="font-medium text-blue-600 min-w-[20px]">${option.label}.</span>
+                    <span class="text-gray-700 text-xs sm:text-base">${option.text}</span>
+                </div>`
+            ).join('');
+
+            questionEl.innerHTML = `
+                <div class="flex flex-col sm:flex-row justify-between items-start mb-2 sm:mb-4">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800">Question ${question.question_no}</h3>
+                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded mt-1 sm:mt-0">
+                        Q${question.question_no}
+                    </span>
+                </div>
+                
+                <div class="mb-2 sm:mb-4">
+                    <p class="text-gray-700 text-sm sm:text-base leading-relaxed">${question.question}</p>
+                </div>
+                
+                <div class="space-y-1 sm:space-y-2">
+                    <h4 class="font-medium text-gray-600 text-xs sm:text-sm uppercase tracking-wide">Options:</h4>
+                    <div class="space-y-1 sm:space-y-2">
+                        ${optionsHtml}
+                    </div>
+                </div>
+                
+                <div class="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-2">
+                    <button class="view-answer-btn w-full sm:w-auto bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-2 sm:px-4 rounded-md text-xs sm:text-sm transition-colors" 
+                            data-question-no="${question.question_no}">
+                        View Answer
+                    </button>
+                    <button class="practice-this-btn w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-2 sm:px-4 rounded-md text-xs sm:text-sm transition-colors"
+                            data-question-no="${question.question_no}">
+                        Practice This
+                    </button>
+                </div>
+                
+                <div class="answer-section hidden mt-3 sm:mt-4 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-md">
+                    <div class="flex items-center space-x-2 mb-1 sm:mb-2">
+                        <span class="text-green-600 font-medium text-xs sm:text-base">✓ Correct Answer:</span>
+                        <span id="correct-answer-${question.question_no}" class="font-semibold text-green-800 text-xs sm:text-base"></span>
+                    </div>
+                </div>
+            `;
+
+            // Add event listeners
+            const viewAnswerBtn = questionEl.querySelector('.view-answer-btn');
+            const practiceBtn = questionEl.querySelector('.practice-this-btn');
+            const answerSection = questionEl.querySelector('.answer-section');
+
+            viewAnswerBtn.addEventListener('click', () => {
+                toggleAnswer(question.question_no, answerSection, viewAnswerBtn);
+            });
+
+            practiceBtn.addEventListener('click', () => {
+                practiceQuestion(question.question_no);
+            });
+
+            return questionEl;
+        }
+
+        // Toggle answer visibility
+        async function toggleAnswer(questionNo, answerSection, button) {
+            if (answerSection.classList.contains('hidden')) {
+                // Show answer - fetch from API
+                try {
+                    const correctAnswerEl = document.getElementById(`correct-answer-${questionNo}`);
+                    if (!correctAnswerEl.textContent || correctAnswerEl.textContent === 'Loading...') {
+                        correctAnswerEl.textContent = 'Loading...';
+                        
+                        const response = await fetch(`/api/comprehensive/answer/${questionNo}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            correctAnswerEl.textContent = data.correct_answer;
+                        } else {
+                            correctAnswerEl.textContent = 'Error loading answer';
+                        }
+                    }
+                    
+                    answerSection.classList.remove('hidden');
+                    button.textContent = 'Hide Answer';
+                } catch (error) {
+                    console.error('Error loading answer:', error);
+                    const correctAnswerEl = document.getElementById(`correct-answer-${questionNo}`);
+                    correctAnswerEl.textContent = 'Error loading answer';
+                }
+            } else {
+                answerSection.classList.add('hidden');
+                button.textContent = 'View Answer';
+            }
+        }
+
+        // Practice specific question
+        function practiceQuestion(questionNo) {
+            // Redirect to practice quiz with specific question
+            window.location.href = `/api/practice/questions?question=${questionNo}`;
+        }
+
+        // Update pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
+            
+            if (totalPages <= 1) {
+                paginationContainerEl.classList.add('hidden');
+                return;
+            }
+
+            paginationContainerEl.classList.remove('hidden');
+            
+            // Update page info
+            pageInfoEl.textContent = `Page ${currentPage} of ${totalPages}`;
+            
+            // Update button states
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage === totalPages;
+        }
+
+        // Filter questions
+        function filterQuestions() {
+            const searchTerm = searchInputEl.value.toLowerCase().trim();
+            const questionNumber = questionNumberFilterEl.value.trim();
+
+            filteredQuestions = allQuestions.filter(question => {
+                const matchesSearch = !searchTerm || 
+                    question.question.toLowerCase().includes(searchTerm) ||
+                    question.options.some(option => option.text.toLowerCase().includes(searchTerm));
+                
+                const matchesNumber = !questionNumber || 
+                    question.question_no.toString() === questionNumber;
+
+                return matchesSearch && matchesNumber;
+            });
+
+            currentPage = 1;
+            updateDisplay();
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchQuestions();
+        });
+
+        // Search and filter events
+        searchInputEl.addEventListener('input', filterQuestions);
+        questionNumberFilterEl.addEventListener('input', filterQuestions);
+
+        clearFiltersBtn.addEventListener('click', () => {
+            searchInputEl.value = '';
+            questionNumberFilterEl.value = '';
+            filteredQuestions = [...allQuestions];
+            currentPage = 1;
+            updateDisplay();
+        });
+
+        refreshBtn.addEventListener('click', fetchQuestions);
+        retryBtn.addEventListener('click', fetchQuestions);
+
+        practiceQuizBtn.addEventListener('click', () => {
+            window.location.href = '/api/practice/questions';
+        });
+
+        // Pagination events
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayQuestions();
+                updatePagination();
+                questionsContainerEl.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        nextPageBtn.addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayQuestions();
+                updatePagination();
+                questionsContainerEl.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (event) => {
+            if (event.ctrlKey && event.key === 'f') {
+                event.preventDefault();
+                searchInputEl.focus();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -23,7 +23,6 @@ class Options(db.Model):
 class Response(db.Model):
     __tablename__= 'response'
     id = db.Column(db.Integer, primary_key=True)
-    pat_id = db.Column(db.Integer, db.ForeignKey('pat.id'), nullable=False)
     question_no = db.Column(db.Integer, db.ForeignKey('questions.question_no'), nullable=False)
     answers_id = db.Column(db.Integer, db.ForeignKey('answers.answer_id'), nullable=False)
     correct_answer = db.Column(db.String(1), nullable=False)

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - CSC 101 Quiz App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="min-h-screen flex items-center justify-center py-8 px-2 sm:py-12 sm:px-4 lg:px-8">
+        <div class="w-full max-w-sm sm:max-w-md space-y-8">
+            <!-- Header -->
+            <div class="text-center">
+                <div class="mx-auto h-10 w-10 sm:h-12 sm:w-12 bg-blue-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-graduation-cap text-white text-lg sm:text-xl"></i>
+                </div>
+                <h2 class="mt-4 sm:mt-6 text-center text-2xl sm:text-3xl font-extrabold text-gray-900">
+                    CSC 101 Introduction To Operating System (OS) Quiz App
+                </h2>
+                <p class="mt-2 text-center text-xs sm:text-sm text-gray-600">
+                    Join our quiz platform and start learning better today
+                </p>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div class="bg-white rounded-lg shadow-xl p-4 sm:p-8">
+                <div class="space-y-6">
+                    <!-- Google Sign Up Button -->
+                    <div>
+                        <a href="{{ url_for('auth.googleLogin') }}" 
+                           class="group relative w-full flex justify-center py-2 sm:py-3 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ease-in-out transform hover:scale-105">
+                            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                                <img src="{{ url_for('static', filename='images/googleIcon.png') }}" alt="Google" class="h-5 w-5 sm:h-6 sm:w-6">
+                            </span>
+                            Sign up with Google
+                        </a>
+                    </div>
+                     <!-- Sign In Link -->
+                <div class="mt-6 text-center">
+                    <p class="text-xs sm:text-sm text-gray-600">
+                        Already have an account?
+                        <a href="{{ url_for('auth.login') }}" class="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200">
+                            Sign in here
+                        </a>
+                    </p>
+                </div>
+
+                    <!-- Divider -->
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-xs sm:text-sm">
+                            <span class="px-2 bg-white text-gray-500">Why choose Google Sign-Up?</span>
+                        </div>
+                    </div>
+
+                    <!-- Benefits -->
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-2 sm:space-x-3">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-shield-alt text-green-500 text-base sm:text-lg"></i>
+                            </div>
+                            <div class="text-xs sm:text-sm text-gray-600">
+                                Secure authentication with Google's trusted platform
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 sm:space-x-3">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-clock text-blue-500 text-base sm:text-lg"></i>
+                            </div>
+                            <div class="text-xs sm:text-sm text-gray-600">
+                                Quick and easy - no need to remember another password
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 sm:space-x-3">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-sync text-purple-500 text-base sm:text-lg"></i>
+                            </div>
+                            <div class="text-xs sm:text-sm text-gray-600">
+                                Seamless access across all your devices
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="bg-blue-50 rounded-lg p-3 sm:p-4">
+                        <h3 class="text-xs sm:text-sm font-medium text-blue-900 mb-2">What you'll get:</h3>
+                        <ul class="text-xs sm:text-sm text-blue-700 space-y-1">
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-blue-600 mr-2"></i>
+                                Access to comprehensive quiz questions
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-blue-600 mr-2"></i>
+                                Practice mode with instant feedback to improve your skills
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-blue-600 mr-2"></i>
+                                Track your progress, performance and time management
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-blue-600 mr-2"></i>
+                                Personalized learning experience made fun
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- Terms and Privacy -->
+            <div class="text-center">
+                <p class="text-[10px] sm:text-xs text-gray-500">
+                    By signing up, you agree to our 
+                    <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a> 
+                    and 
+                    <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay for better UX -->
+    <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-4 sm:p-6 flex items-center space-x-2 sm:space-x-3">
+            <div class="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-blue-600"></div>
+            <span class="text-gray-700 text-xs sm:text-base">Signing you up...</span>
+        </div>
+    </div>
+
+</body>
+</html>

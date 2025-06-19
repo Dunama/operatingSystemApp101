@@ -11,7 +11,7 @@ paystack_bp = Blueprint('paystack', __name__, url_prefix='/paystack')
 PRO_FEATURE = {
     'name': 'Quiz App Pro',
     # ₦1050 in kobo (Paystack uses kobo)
-    'price': 1050,
+    'price': 105000,
     'description': 'Access to full Quiz and Study features'
 }
 

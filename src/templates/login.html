@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Quiz App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen flex flex-col justify-center items-center">
+    <div class="w-full max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-8 mt-8">
+        <h1 class="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-blue-500 to-blue-700 text-white mb-6 py-4 rounded-lg shadow">
+            Introduction to Operating System (CSC 101) Quiz App
+        </h1>
+       
+        <!-- Sections -->
+        <div class="space-y-4">
+            <!-- Demo Questions -->
+            <div class="bg-red-100 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-red-800">Demo Questions</h2>
+                    <p class="text-xs text-gray-600 mt-1">Try a short demo quiz to see how it works.</p>
+                </div>
+                <a href="/api/demo/questions"
+                   class="mt-3 sm:mt-0 sm:ml-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md text-xs sm:text-base transition-colors text-center">
+                    Start Demo
+                </a>
+            </div>
+            <!-- Quiz Section -->
+            <div class="bg-green-100 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-green-900">Quiz</h2>
+                    <p class="text-xs text-gray-600 mt-1">Take a full-length practice quiz and track your progress.</p>
+                </div>
+                {% if pro %}
+                <a id="quiz-btn" href="/api/practice/questions"
+                   class="mt-3 sm:mt-0 sm:ml-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md text-xs sm:text-base transition-colors text-center">
+                    Start Quiz
+                </a>
+                {% else %}
+                <a id="quiz-btn" href="/api/practice/questions"
+                   class="mt-3 sm:mt-0 sm:ml-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md text-xs sm:text-base transition-colors text-center relative">
+                    Start Quiz
+                    <span class="absolute top-2 right-4 text-yellow-400"><i class="fas fa-lock"></i></span>
+                </a>
+                {% endif %}
+            </div>
+            <!-- Study & Practice -->
+            <div class="bg-yellow-100 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-yellow-800">Study & Practice</h2>
+                    <p class="text-xs text-gray-600 mt-1">Browse the question bank and practice specific topics.</p>
+                </div>
+                {% if pro %}
+                <a id="study-btn" href="/api/comprehensive/all-questions"
+                   class="mt-3 sm:mt-0 sm:ml-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md text-xs sm:text-base transition-colors text-center">
+                    Go to Question Bank
+                </a>
+                {% else %}
+                <a id="study-btn" href="/api/comprehensive/all-questions"
+                   class="mt-3 sm:mt-0 sm:ml-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md text-xs sm:text-base transition-colors text-center relative">
+                    Go to Question Bank
+                    <span class="absolute top-2 right-4 text-yellow-300"><i class="fas fa-lock"></i></span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <p class="mt-6 text-center text-xs text-gray-400">© 2024 Quiz App. All rights reserved.</p>
+
+    <!-- Pro Feature Locked Modal -->
+    <div id="pro-modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-sm w-full p-6 text-center relative">
+            <button id="close-pro-modal" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl">&times;</button>
+            <div class="flex flex-col items-center">
+                <div class="bg-yellow-400 rounded-full p-3 mb-3">
+                    <i class="fas fa-lock text-white text-2xl"></i>
+                </div>
+                <h2 class="text-lg font-bold text-gray-800 mb-2">Pro Feature Locked</h2>
+                <p class="text-gray-600 mb-4 text-sm">
+                    This feature is available only to Pro users.<br>
+                    Unlock <span class="font-semibold text-blue-600">Quiz</span> and <span class="font-semibold text-blue-600">Study & Practice</span> for just <span class="font-bold text-green-600">₦1000</span>.
+                </p>
+                <button id="buy-pro-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-200">
+                    Buy Pro for ₦1000 only 
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Processing Modal -->
+    <div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-sm w-full p-6 text-center relative">
+            <div class="flex flex-col items-center">
+                <div class="mb-4">
+                    <i class="fas fa-spinner fa-spin text-blue-600 text-3xl"></i>
+                </div>
+                <h2 class="text-lg font-bold text-gray-800 mb-2">Processing Payment</h2>
+                <p class="text-gray-600 mb-4 text-sm">
+                    Please wait while we connect to the payment gateway...
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lock Quiz and Study & Practice buttons
+            const quizBtn = document.getElementById('quiz-btn');
+            const studyBtn = document.getElementById('study-btn');
+            const proModal = document.getElementById('pro-modal');
+            const paymentModal = document.getElementById('payment-modal');
+            const closeProModal = document.getElementById('close-pro-modal');
+            const buyProBtn = document.getElementById('buy-pro-btn');
+
+            function showProModal(e) {
+                e.preventDefault();
+                proModal.classList.remove('hidden');
+            }
+
+            // Safely pass the pro variable
+            var pro = JSON.parse('{{ pro|tojson }}');
+            console.log('Pro status loaded:', pro); // Enhanced debugging
+            
+            // Check session storage as fallback
+            const sessionPro = sessionStorage.getItem('pro_status');
+            console.log('Session storage pro status:', sessionPro);
+            
+            if (pro) {
+                // Store pro status in session storage as fallback
+                sessionStorage.setItem('pro_status', 'true');
+                console.log('Pro status stored in session storage');
+            }
+            if (!pro) {
+                if (quizBtn) {
+                    quizBtn.addEventListener('click', showProModal);
+                }
+                if (studyBtn) {
+                    studyBtn.addEventListener('click', showProModal);
+                }
+            }
+            if (closeProModal) {
+                closeProModal.addEventListener('click', function() {
+                    proModal.classList.add('hidden');
+                });
+            }
+            if (buyProBtn) {
+                buyProBtn.addEventListener('click', async function() {
+                    // Collect email
+                    const email = prompt("Enter your email to continue with payment:");
+                    if (!email) {
+                        return; // User cancelled email input
+                    }
+                    
+                    // Email validation
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        alert("Please enter a valid email address");
+                        return;
+                    }
+                    
+                    // Hide pro modal and show payment processing modal
+                    proModal.classList.add('hidden');
+                    paymentModal.classList.remove('hidden');
+                    
+                    try {
+                        const response = await fetch('/paystack/initialize', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                email: email,
+                                amount: 10000, // Amount in kobo (₦1000)
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(data.message || 'Payment initialization failed');
+                        }
+                        
+                        if (data && data.data && data.data.authorization_url) {
+                            // Redirect to Paystack payment page
+                            window.location.href = data.data.authorization_url;
+                        } else {
+                            throw new Error("Could not get payment link");
+                        }
+                    } catch (error) {
+                        paymentModal.classList.add('hidden');
+                        alert("Payment Error: " + error.message);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

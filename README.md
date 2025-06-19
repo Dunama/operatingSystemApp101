@@ -1,6 +1,6 @@
-# CS205 Quiz Application
+# CS101 Quiz Application(Introduction to Operating System)
 
-A web-based quiz application for Operating Systems course.
+A web-based quiz application for Introduction To Operating Systems course.
 
 ## Setup
 

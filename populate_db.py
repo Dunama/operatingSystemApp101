@@ -1,4 +1,4 @@
-from cs_205.app import create_app
+from app import create_app
 from src.db.core import db
 from src.db.models.quiz_db import Questions, Options, Answers
 from src.db.models.quiz_questions import quiz_questions
@@ -9,7 +9,7 @@ def populate_database():
     with app.app_context():
         # Clear existing data
         print("Clearing existing data...")
-        Answers.query.delete()
+        Answers.query.delete() 
         Options.query.delete()
         Questions.query.delete()
         db.session.commit()
